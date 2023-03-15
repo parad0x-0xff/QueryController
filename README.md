@@ -52,7 +52,15 @@ https://www.example.com/card/?pid=W00t&c=home&af_js_web=true&af_ad=faca-parte&af
 https://www.example.com/card/?pid=site&c=home&af_js_web=true&af_ad=W00t&af_sub1=site
 https://www.example.com/card/?pid=site&c=home&af_js_web=true&af_ad=faca-parte&af_sub1=W00t
 ```
-
+### Changing the payload
+```r
+$ python3 QueryController.py -f target.txt -p "NEW PAYLOAD"
+https://www.example.com/card/?pid=NEW+PAYLOAD&c=home&af_js_web=true&af_ad=faca-parte&af_sub1=site
+https://www.example.com/card/?pid=site&c=NEW+PAYLOAD&af_js_web=true&af_ad=faca-parte&af_sub1=site
+https://www.example.com/card/?pid=site&c=home&af_js_web=NEW+PAYLOAD&af_ad=faca-parte&af_sub1=site
+https://www.example.com/card/?pid=site&c=home&af_js_web=true&af_ad=NEW+PAYLOAD&af_sub1=site
+https://www.example.com/card/?pid=site&c=home&af_js_web=true&af_ad=faca-parte&af_sub1=NEW+PAYLOAD
+```
 
 ## Similar tools I've found:
 
