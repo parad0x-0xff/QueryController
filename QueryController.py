@@ -51,7 +51,6 @@ def modify_query_params(parsed_url, query_params, modified_url):
 
 
 def main():
-    print(args.input)
     if args.input == '-':
         wordlist = [line.strip() for line in sys.stdin]
         modified_urls = parse_query_params(wordlist)
