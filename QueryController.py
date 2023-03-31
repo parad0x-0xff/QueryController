@@ -13,6 +13,7 @@ args = parser.parse_args()
 
 def parse_query_params(wordlist):
     modified_url = []
+    updated_url = ''
     for url in wordlist:
         parsed_url = urlparse(url)
         if not parsed_url.query:
@@ -36,9 +37,9 @@ def modify_query_params(parsed_url, query_params, modified_url):
                     updated_url = parsed_url._replace(query=urlencode(query_params, doseq=True)).geturl()
                     modified_url.append(updated_url)
                     query_params[key] = parse_qs(parsed_url.query, keep_blank_values=True)[key][0]
-    
+
     elif args.query == False or not exists(f'{args.query}'):
-        
+
         for i, key in enumerate(query_params):
             query_params[key] = args.payload
             updated_url = parsed_url._replace(query=urlencode(query_params, doseq=True)).geturl()
@@ -54,14 +55,14 @@ def main():
     if args.input == '-':
         wordlist = [line.strip() for line in sys.stdin]
         modified_urls = parse_query_params(wordlist)
-    
+
     elif exists(f'{args.file}'):
         with open(f'{args.file}', 'r') as f:
             wordlist = [line.strip() for line in f.readlines()]
             modified_urls = parse_query_params(wordlist)
     else:
         parser.error('Input file is missing...')
-    
+
     for url in modified_urls:
         print(url)
 
