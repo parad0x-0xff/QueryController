@@ -4,13 +4,30 @@ import argparse
 from os.path import exists
 from urllib.parse import urlparse, parse_qs, urlencode
 import sys
+import re
 parser = argparse.ArgumentParser(description='Modify the values of query parameters in a list of URLs.')
-parser.add_argument('-f', '--file', help='the file containing the list of URLs to modify.')
-parser.add_argument('-q', '--query', help='the file containing the list of parameters to filter.', default=False)
-parser.add_argument('-p', '--payload', help='the payload to substitute.', default='W00t')
-parser.add_argument('-i', '--input', help='receive input from a piped tool.')
+parser.add_argument('-f', '--file', nargs='?',type=argparse.FileType('r'), default=sys.stdin, help='A file containing the list of URLs to modify OR piped stdin.')
+parser.add_argument('-q', '--query', help='A file containing the list of parameters to filter.', default=False)
+parser.add_argument('-p', '--payload', help='Payload to substitute.', default='W00t')
+parser.add_argument('-e', '--extension', help='Extensions file to avoid.',default=False)
 args = parser.parse_args()
 
+def extension_parse(ext_file, parsed_url):
+    try:
+        with open(ext_file) as ext:
+            for line in ext.readlines():
+                extension = line.strip()
+                if not extension: 
+                    continue
+                pattern = ".*" + re.escape(extension)
+                if re.search(pattern, parsed_url.query):
+                    return None
+            return parsed_url
+    except FileNotFoundError:
+        parser.error('Extension file not found...')
+    except IOError:
+        parser.error('Error reading extension file...')
+        
 def parse_query_params(wordlist):
     modified_url = []
     updated_url = ''
@@ -18,9 +35,11 @@ def parse_query_params(wordlist):
         parsed_url = urlparse(url)
         if not parsed_url.query:
             continue
-        if '.css' in parsed_url.path or '.js' in parsed_url.path:
-            continue
-        query_params = parse_qs(parsed_url.query, keep_blank_values=True, strict_parsing=False, encoding='utf-8', errors='replace', max_num_fields=None)
+        if args.extension != False:
+            new_url = extension_parse(args.extension, parsed_url)
+            if new_url is None:
+                continue
+        query_params = parse_qs(parsed_url.query, keep_blank_values=False, strict_parsing=False, encoding='utf-8', errors='replace', max_num_fields=None)
         updated_url = modify_query_params(parsed_url, query_params, modified_url)
     return updated_url
 
@@ -52,15 +71,12 @@ def modify_query_params(parsed_url, query_params, modified_url):
 
 
 def main():
-    if args.input == '-':
-        wordlist = [line.strip() for line in sys.stdin]
-        modified_urls = parse_query_params(wordlist)
 
-    elif exists(f'{args.file}'):
-        with open(f'{args.file}', 'r') as f:
+    try:
+        with args.file as f:
             wordlist = [line.strip() for line in f.readlines()]
             modified_urls = parse_query_params(wordlist)
-    else:
+    except:
         parser.error('Input file is missing...')
 
     for url in modified_urls:

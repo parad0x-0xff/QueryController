@@ -62,6 +62,16 @@ https://www.example.com/card/?pid=site&c=home&af_js_web=true&af_ad=NEW+PAYLOAD&a
 https://www.example.com/card/?pid=site&c=home&af_js_web=true&af_ad=faca-parte&af_sub1=NEW+PAYLOAD
 ```
 
+### Avoid extensions + piped input
+```r
+$ cat hosts_file.txt |python3 QueryController.py -e ext.txt -p w00t_w00t
+https://www.example.com/card/?wsonly=w00t_w00t&test=123
+https://www.example.com/card/?wsonly=yes&test=w00t_w00t
+https://www.example.com/card/?wsonly=w00t_w00t
+https://www.example.com/card/super/index.php?query=w00t_w00t&number=root_under
+https://www.example.com/card/super/index.php?query=1337&number=w00t_w00t
+```
+
 ## Similar tools I've found:
 
 * [ParamChanger](https://github.com/mathis2001/ParamChanger)
@@ -71,6 +81,6 @@ https://www.example.com/card/?pid=site&c=home&af_js_web=true&af_ad=faca-parte&af
 ## To-Do List:
 - [x] Filter only specified params.
 - [x] Change all params one at time.
-- [ ] possibility to avoid some extensions .css, .png, etc...
-- [ ] Receive input from a piped stdin.
+- [x] possibility to avoid some extensions .css, .png, etc...
+- [x] Receive input from a piped stdin.
 - [ ] Add top payloads list.
